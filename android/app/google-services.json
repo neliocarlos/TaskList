@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "438191971847",
+    "project_id": "tarefacil-c0290",
+    "storage_bucket": "tarefacil-c0290.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:438191971847:android:8b6556a83e0ac3587754a2",
+        "android_client_info": {
+          "package_name": "com.example.gtk_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArBmm_n065Vt420iQQ0F_aem1MwVwB2L4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:438191971847:android:b7c436117fb40a997754a2",
+        "android_client_info": {
+          "package_name": "com.example.learning_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArBmm_n065Vt420iQQ0F_aem1MwVwB2L4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
