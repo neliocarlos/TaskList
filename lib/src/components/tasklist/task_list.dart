@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'src/widgets.dart';
+import '../../auth/widgets.dart';
 import 'task_list_dto.dart';
 
 class TaskList extends StatefulWidget {
@@ -53,18 +53,17 @@ class _TaskListState extends State<TaskList> {
                   ),
                   const SizedBox(width: 8, height: 12),
                   SizedBox(
-                    // width: constraints.maxWidth * .1,
-                    child: StyledButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          await widget.addTask(_title.text, _description.text);
-                          _title.clear();
-                          _description.clear();
-                        }
-                      },
-                      child: const Icon(Icons.add),
-                      )
-                    ),
+                      // width: constraints.maxWidth * .1,
+                      child: StyledButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        await widget.addTask(_title.text, _description.text);
+                        _title.clear();
+                        _description.clear();
+                      }
+                    },
+                    child: const Icon(Icons.add),
+                  )),
                 ],
               ),
             ),
@@ -73,12 +72,17 @@ class _TaskListState extends State<TaskList> {
           for (var task in widget.tasks)
             // Paragraph('${task.title}: ${task.description}'),
             Card(
-                  child: ListTile(
-                  title: Text(task.title),
-                  subtitle: Text(task.description),
-                  trailing: IconButton(onPressed: () { null; }, 
-                    icon: const Icon(Icons.check_circle),),),
+              child: ListTile(
+                title: Text(task.title),
+                subtitle: Text(task.description),
+                trailing: IconButton(
+                  onPressed: () {
+                    null;
+                  },
+                  icon: const Icon(Icons.check_circle),
                 ),
+              ),
+            ),
           const SizedBox(height: 8),
         ],
       );
