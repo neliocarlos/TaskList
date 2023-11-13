@@ -56,7 +56,7 @@ final _router = GoRouter(
                     user.sendEmailVerification();
                     const snackBar = SnackBar(
                         content: Text(
-                            'Please check your email to verify your email address'));
+                            'Por favor verifique seu endereço de email'));
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                   context.pushReplacement('/');

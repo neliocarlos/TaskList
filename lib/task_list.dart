@@ -63,14 +63,8 @@ class _TaskListState extends State<TaskList> {
                         }
                       },
                       child: const Icon(Icons.add),
-                      
-                          
-                          // SizedBox(width: 4),
-                          // Text('Adicionar'),
-                        
                       )
                     ),
-                  
                 ],
               ),
             ),
