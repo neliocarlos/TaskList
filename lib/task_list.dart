@@ -8,7 +8,7 @@ import 'task_list_dto.dart';
 class TaskList extends StatefulWidget {
   const TaskList({required this.addTask, required this.tasks, super.key});
 
-  final FutureOr<void> Function(String message) addTask;
+  final FutureOr<void> Function(String title, String description) addTask;
   final List<TaskListDto> tasks;
 
   @override
@@ -16,7 +16,7 @@ class TaskList extends StatefulWidget {
 }
 
 class _TaskListState extends State<TaskList> {
-  final _formKey = GlobalKey<FormState>(debugLabel: '_GuestBookState');
+  final _formKey = GlobalKey<FormState>(debugLabel: '_TaskListState');
   final _title = TextEditingController();
   final _description = TextEditingController();
 
@@ -53,30 +53,38 @@ class _TaskListState extends State<TaskList> {
                   ),
                   const SizedBox(width: 8, height: 12),
                   SizedBox(
-                    width: constraints.maxWidth * .3,
+                    // width: constraints.maxWidth * .1,
                     child: StyledButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          await widget.addTask(_title.text);
+                          await widget.addTask(_title.text, _description.text);
                           _title.clear();
+                          _description.clear();
                         }
                       },
-                      child: const Row(
-                        children: [
-                          Icon(Icons.send),
-                          SizedBox(width: 4),
-                          Text('SEND'),
-                        ],
-                      ),
+                      child: const Icon(Icons.add),
+                      
+                          
+                          // SizedBox(width: 4),
+                          // Text('Adicionar'),
+                        
+                      )
                     ),
-                  )
+                  
                 ],
               ),
             ),
           ),
           const SizedBox(height: 8),
           for (var task in widget.tasks)
-            Paragraph('${task.title}: ${task.description}'),
+            // Paragraph('${task.title}: ${task.description}'),
+            Card(
+                  child: ListTile(
+                  title: Text(task.title),
+                  subtitle: Text(task.description),
+                  trailing: IconButton(onPressed: () { null; }, 
+                    icon: const Icon(Icons.check_circle),),),
+                ),
           const SizedBox(height: 8),
         ],
       );

@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart'
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gtk_flutter/task_list_dto.dart';
 
 import 'firebase_options.dart';
 import 'guest_book_message.dart';
@@ -28,7 +29,7 @@ class ApplicationState extends ChangeNotifier {
     });
   }
 
-  Future<DocumentReference> addToTaskBoard(String task) {
+  Future<DocumentReference> addToTaskBoard(String description, String title) {
     if (!_loggedIn) {
       throw Exception('Must be logged in');
     }
@@ -36,7 +37,8 @@ class ApplicationState extends ChangeNotifier {
     return FirebaseFirestore.instance
         .collection('tasklist')
         .add(<String, dynamic>{
-      'text': task,
+      'title': title,
+      'description': description,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'name': FirebaseAuth.instance.currentUser!.displayName,
       'userId': FirebaseAuth.instance.currentUser!.uid,
@@ -53,6 +55,10 @@ class ApplicationState extends ChangeNotifier {
   StreamSubscription<QuerySnapshot>? _guestBookSubscription;
   List<GuestBookMessage> _guestBookMessages = [];
   List<GuestBookMessage> get guestBookMessages => _guestBookMessages;
+
+  StreamSubscription<QuerySnapshot>? _taskListSubscription;
+  List<TaskListDto> _taskListArray = [];
+  List<TaskListDto> get taskListArray => _taskListArray;
 
   int _attendees = 0;
   int get attendees => _attendees;
@@ -100,7 +106,23 @@ class ApplicationState extends ChangeNotifier {
             _guestBookMessages.add(
               GuestBookMessage(
                 name: document.data()['name'] as String,
-                message: document.data()['text'] as String,
+                message: document.data()['title'] as String,
+              ),
+            );
+          }
+          notifyListeners();
+        });
+        _taskListSubscription = FirebaseFirestore.instance
+            .collection('tasklist')
+            .orderBy('timestamp', descending: true)
+            .snapshots()
+            .listen((snapshot) {
+          _taskListArray = [];
+          for (final document in snapshot.docs) {
+            _taskListArray.add(
+              TaskListDto(
+                title: document.data()['title'] as String,
+                description: document.data()['description'] as String,
               ),
             );
           }
@@ -126,6 +148,8 @@ class ApplicationState extends ChangeNotifier {
         _loggedIn = false;
         _guestBookMessages = [];
         _guestBookSubscription?.cancel();
+        _taskListArray = [];
+        _taskListSubscription?.cancel(); 
       }
       notifyListeners();
     });

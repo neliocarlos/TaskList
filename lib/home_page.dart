@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart'
     hide EmailAuthProvider, PhoneAuthProvider;
 import 'package:flutter/material.dart';
+import 'package:gtk_flutter/task_list.dart';
 import 'package:provider/provider.dart';
 
 import 'app_state.dart';
@@ -16,7 +17,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tarefácil'),
+        title: const Text('TAREFÁCIL'),
       ),
       body: ListView(
         children: <Widget>[
@@ -35,29 +36,30 @@ class HomePage extends StatelessWidget {
             color: Colors.grey,
           ),
           const Header('Adicione suas Tarefas'),
-          const Paragraph(
-            'Join us for a day full of Firebase Workshops and Pizza!',
-          ),
+          // const Paragraph(
+          //   'Join us for a day full of Firebase Workshops and Pizza!',
+          // ),
           Consumer<ApplicationState>(
             builder: (context, appState, _) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                switch (appState.attendees) {
-                  1 => const Paragraph('1 person going'),
-                  >= 2 => Paragraph('${appState.attendees} people going'),
-                  _ => const Paragraph('No one going'),
-                },
+                // switch (appState.attendees) {
+                //   1 => const Paragraph('1 person going'),
+                //   >= 2 => Paragraph('${appState.attendees} people going'),
+                //   _ => const Paragraph('No one going'),
+                // },
                 if (appState.loggedIn) ...[
-                  YesNoSelection(
-                    state: appState.attending,
-                    onSelection: (attending) => appState.attending = attending,
-                  ),
-                  const Header('Discussion'),
-                  GuestBook(
-                    addMessage: (message) =>
-                        appState.addMessageToGuestBook(message),
-                    messages: appState.guestBookMessages,
-                  ),
+                  // YesNoSelection(
+                  //   state: appState.attending,
+                  //   onSelection: (attending) => appState.attending = attending,
+                  // ),
+                  // const Header('Lembrete'),
+                  // GuestBook(
+                  //   addMessage: (message) =>
+                  //       appState.addMessageToGuestBook(message),
+                  //   messages: appState.guestBookMessages,
+                  // ),
+                  TaskList(addTask: (description, title) => appState.addToTaskBoard(title, description), tasks: appState.taskListArray)
                 ],
               ],
             ),
