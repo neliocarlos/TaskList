@@ -1,14 +1,21 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../auth/widgets.dart';
 import 'task_list_dto.dart';
 
 class TaskList extends StatefulWidget {
-  const TaskList({required this.addTask, required this.tasks, super.key});
+  const TaskList(
+      {required this.addTask,
+      required this.deleteTask,
+      required this.tasks,
+      super.key});
 
-  final FutureOr<void> Function(String title, String description) addTask;
+  final FutureOr<DocumentReference> Function(String title, String description)
+      addTask;
+  final Future<void> Function(String taskId) deleteTask;
   final List<TaskListDto> tasks;
 
   @override
@@ -53,11 +60,12 @@ class _TaskListState extends State<TaskList> {
                   ),
                   const SizedBox(width: 8, height: 12),
                   SizedBox(
-                      // width: constraints.maxWidth * .1,
                       child: StyledButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        await widget.addTask(_title.text, _description.text);
+                        DocumentReference docRef = await widget.addTask(
+                            _title.text, _description.text);
+                        String taskId = docRef.id;
                         _title.clear();
                         _description.clear();
                       }
@@ -70,16 +78,19 @@ class _TaskListState extends State<TaskList> {
           ),
           const SizedBox(height: 8),
           for (var task in widget.tasks)
-            // Paragraph('${task.title}: ${task.description}'),
             Card(
               child: ListTile(
                 title: Text(task.title),
                 subtitle: Text(task.description),
                 trailing: IconButton(
-                  onPressed: () {
-                    null;
+                  onPressed: () async {
+                    String taskId = task.id;
+                    await widget.deleteTask(taskId);
                   },
-                  icon: const Icon(Icons.check_circle),
+                  icon: Icon(
+                    Icons.delete,
+                    color: Color.fromARGB(255, 219, 22, 18),
+                  ),
                 ),
               ),
             ),

@@ -42,6 +42,7 @@ class HomePage extends StatelessWidget {
                   TaskList(
                       addTask: (description, title) =>
                           appState.addToTaskBoard(title, description),
+                      deleteTask: (taskId) => appState.deleteTask(taskId),
                       tasks: appState.taskListArray)
                 ],
               ],
