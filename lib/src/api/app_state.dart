@@ -6,10 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart'
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gtk_flutter/task_list_dto.dart';
+import 'package:gtk_flutter/src/components/tasklist/task_list_dto.dart';
 
 import 'firebase_options.dart';
-
 
 class ApplicationState extends ChangeNotifier {
   Future<DocumentReference> addToTaskBoard(String description, String title) {
@@ -48,7 +47,7 @@ class ApplicationState extends ChangeNotifier {
     ]);
 
     FirebaseAuth.instance.userChanges().listen((user) {
-      if (user != null) {   
+      if (user != null) {
         _loggedIn = true;
         _taskListSubscription = FirebaseFirestore.instance
             .collection('tasklist')
@@ -59,9 +58,8 @@ class ApplicationState extends ChangeNotifier {
           for (final document in snapshot.docs) {
             _taskListArray.add(
               TaskListDto(
-                title: document.data()['title'] as String,
-                description: document.data()['description'] as String
-              ),
+                  title: document.data()['title'] as String,
+                  description: document.data()['description'] as String),
             );
           }
           notifyListeners();
@@ -69,7 +67,7 @@ class ApplicationState extends ChangeNotifier {
       } else {
         _loggedIn = false;
         _taskListArray = [];
-        _taskListSubscription?.cancel(); 
+        _taskListSubscription?.cancel();
       }
       notifyListeners();
     });

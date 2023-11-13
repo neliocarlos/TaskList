@@ -8,8 +8,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'app_state.dart';
-import 'home_page.dart';
+import 'src/api/app_state.dart';
+import 'src/pages/home/home_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,8 +55,8 @@ final _router = GoRouter(
                   if (!user.emailVerified) {
                     user.sendEmailVerification();
                     const snackBar = SnackBar(
-                        content: Text(
-                            'Por favor verifique seu endereço de email'));
+                        content:
+                            Text('Por favor verifique seu endereço de email'));
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                   context.pushReplacement('/');
