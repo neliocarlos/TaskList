@@ -54,6 +54,10 @@ class ApplicationState extends ChangeNotifier {
     });
   }
 
+  Future<void> logOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
   ApplicationState() {
     init();
   }

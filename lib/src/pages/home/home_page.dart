@@ -1,15 +1,23 @@
 import 'package:firebase_auth/firebase_auth.dart'
     hide EmailAuthProvider, PhoneAuthProvider;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gtk_flutter/src/components/tasklist/task_list.dart';
 import 'package:provider/provider.dart';
 
 import '../../api/app_state.dart';
 import '../../auth/authentication.dart';
-import '../../auth/widgets.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  void toggleLogin(BuildContext context, ApplicationState appState) {
+    if (appState.loggedIn) {
+      appState.logOut();
+    } else {
+      context.push('/sign-in');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +41,6 @@ class HomePage extends StatelessWidget {
             endIndent: 8,
             color: Colors.grey,
           ),
-          const Header('Adicione suas Tarefas'),
           Consumer<ApplicationState>(
             builder: (context, appState, _) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,6 +56,34 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Página Inicial',
+              backgroundColor: Color.fromARGB(255, 44, 92, 196)),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.logout,
+              color: Colors.red,
+            ),
+            label: 'Sair',
+          ),
+        ],
+        onTap: (int index) {
+          if (index == 1) {
+            GoRouter.of(context).go('/profile');
+          } else if (index == 2) {
+            toggleLogin(
+                context, Provider.of<ApplicationState>(context, listen: false));
+            context.push('/sign-in');
+          }
+        },
       ),
     );
   }
