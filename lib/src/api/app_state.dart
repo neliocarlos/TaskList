@@ -11,12 +11,13 @@ import 'package:gtk_flutter/src/components/tasklist/task_list_dto.dart';
 import 'firebase_options.dart';
 
 class ApplicationState extends ChangeNotifier {
-  Future<DocumentReference> addToTaskBoard(String description, String title) {
+  Future<DocumentReference> addToTaskBoard(
+      String description, String title) async {
     if (!_loggedIn) {
       throw Exception('Must be logged in');
     }
 
-    return FirebaseFirestore.instance
+    DocumentReference docRef = await FirebaseFirestore.instance
         .collection('tasklist')
         .add(<String, dynamic>{
       'title': title,
@@ -25,6 +26,36 @@ class ApplicationState extends ChangeNotifier {
       'name': FirebaseAuth.instance.currentUser!.displayName,
       'userId': FirebaseAuth.instance.currentUser!.uid,
     });
+
+    return docRef;
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    if (!_loggedIn) {
+      throw Exception('Must be logged in');
+    }
+
+    await FirebaseFirestore.instance
+        .collection('tasklist')
+        .doc(taskId)
+        .delete();
+  }
+
+  Future<void> updateTask(
+      String taskId, String newDescription, String newTitle) async {
+    if (!_loggedIn) {
+      throw Exception('Must be logged in');
+    }
+
+    await FirebaseFirestore.instance.collection('tasklist').doc(taskId).update({
+      'description': newDescription,
+      'title': newTitle,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
+  }
+
+  Future<void> logOut() async {
+    await FirebaseAuth.instance.signOut();
   }
 
   ApplicationState() {
@@ -56,11 +87,7 @@ class ApplicationState extends ChangeNotifier {
             .listen((snapshot) {
           _taskListArray = [];
           for (final document in snapshot.docs) {
-            _taskListArray.add(
-              TaskListDto(
-                  title: document.data()['title'] as String,
-                  description: document.data()['description'] as String),
-            );
+            _taskListArray.add(TaskListDto.fromDocument(document));
           }
           notifyListeners();
         });
