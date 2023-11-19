@@ -40,6 +40,16 @@ class _TaskListState extends State<TaskList> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  if (widget.tasks.isEmpty)
+                  Center(
+                    heightFactor: 22,
+                    child: Text(
+                      'Está meio vazio por aqui, não acha?',
+                      style: TextStyle(
+                        fontSize: 16
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   for (var task in widget.tasks)
                     Card(
