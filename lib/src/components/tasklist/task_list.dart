@@ -27,6 +27,29 @@ class _TaskListState extends State<TaskList> {
   final _title = TextEditingController();
   final _description = TextEditingController();
 
+  DateTime _dateTime = DateTime.now();
+
+  void _showDatePicker() async {
+  DateTime? pickedDate = await _selectDate(context);
+  if (pickedDate != null && pickedDate != _dateTime) {
+    setState(() {
+      _dateTime = pickedDate;
+    });
+  }
+}
+
+Future<DateTime?> _selectDate(BuildContext context) async {
+  DateTime currentDate = _dateTime;
+  DateTime? pickedDate = await showDatePicker(
+    context: context,
+    initialDate: currentDate,
+    firstDate: DateTime.now(),
+    lastDate: DateTime(2050),
+  );
+  return pickedDate;
+}
+
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -124,6 +147,24 @@ class _TaskListState extends State<TaskList> {
                                     decoration: const InputDecoration(
                                       hintText: 'Descreva a atividade',
                                     ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Text(
+                                          '${_dateTime.day}/${_dateTime.month}/${_dateTime.year}',
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: _showDatePicker, 
+                                          child: Text('Calendário')
+                                        ),
+                                      ],
+                                    )
                                   ),
                                   const SizedBox(height: 24),
                                   Container(
