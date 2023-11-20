@@ -11,7 +11,8 @@ import 'package:gtk_flutter/src/components/tasklist/task_list_dto.dart';
 import 'firebase_options.dart';
 
 class ApplicationState extends ChangeNotifier {
-  Future<DocumentReference> addToTaskBoard(String date, String title) async {
+  Future<DocumentReference> addToTaskBoard(
+      String date, String title, String color) async {
     if (!_loggedIn) {
       throw Exception('Must be logged in');
     }
@@ -21,6 +22,7 @@ class ApplicationState extends ChangeNotifier {
         .add(<String, dynamic>{
       'title': title,
       'date': date,
+      'color': color,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'name': FirebaseAuth.instance.currentUser!.displayName,
       'userId': FirebaseAuth.instance.currentUser!.uid,
@@ -41,16 +43,25 @@ class ApplicationState extends ChangeNotifier {
   }
 
   Future<void> updateTask(
-      String taskId, String newdate, String newTitle) async {
+      String taskId, String newDate, String newTitle, String newColor) async {
     if (!_loggedIn) {
       throw Exception('Must be logged in');
     }
 
-    await FirebaseFirestore.instance.collection('tasklist').doc(taskId).update({
-      'date': newdate,
-      'title': newTitle,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-    });
+    try {
+      await FirebaseFirestore.instance
+          .collection('tasklist')
+          .doc(taskId)
+          .update({
+        'date': newDate,
+        'title': newTitle,
+        'color': newColor,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Erro ao atualizar a tarefa: $e');
+      rethrow;
+    }
   }
 
   Future<void> logOut() async {
