@@ -13,8 +13,7 @@ class TaskList extends StatefulWidget {
       required this.tasks,
       super.key});
 
-  final FutureOr<DocumentReference> Function(String title, String description)
-      addTask;
+  final FutureOr<DocumentReference> Function(String title, String date) addTask;
   final Future<void> Function(String taskId) deleteTask;
   final List<TaskListDto> tasks;
 
@@ -25,30 +24,31 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   final _formKey = GlobalKey<FormState>(debugLabel: '_TaskListState');
   final _title = TextEditingController();
-  final _description = TextEditingController();
+  final _date = TextEditingController();
 
   DateTime _dateTime = DateTime.now();
 
   void _showDatePicker() async {
-  DateTime? pickedDate = await _selectDate(context);
-  if (pickedDate != null && pickedDate != _dateTime) {
-    setState(() {
-      _dateTime = pickedDate;
-    });
+    DateTime? pickedDate = await _selectDate(context);
+    if (pickedDate != null && pickedDate != _dateTime) {
+      setState(() {
+        _dateTime = pickedDate;
+        _date.text = '${_dateTime.day}/${_dateTime.month}/${_dateTime.year}';
+        _dateTime = DateTime.now();
+      });
+    }
   }
-}
 
-Future<DateTime?> _selectDate(BuildContext context) async {
-  DateTime currentDate = _dateTime;
-  DateTime? pickedDate = await showDatePicker(
-    context: context,
-    initialDate: currentDate,
-    firstDate: DateTime.now(),
-    lastDate: DateTime(2050),
-  );
-  return pickedDate;
-}
-
+  Future<DateTime?> _selectDate(BuildContext context) async {
+    DateTime currentDate = _dateTime;
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: currentDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2050),
+    );
+    return pickedDate;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,15 +64,13 @@ Future<DateTime?> _selectDate(BuildContext context) async {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   if (widget.tasks.isEmpty)
-                  Center(
-                    heightFactor: 22,
-                    child: Text(
-                      'Está meio vazio por aqui, não acha?',
-                      style: TextStyle(
-                        fontSize: 16
+                    Center(
+                      heightFactor: 22,
+                      child: Text(
+                        'Está meio vazio por aqui, não acha?',
+                        style: TextStyle(fontSize: 16),
                       ),
                     ),
-                  ),
                   const SizedBox(height: 8),
                   for (var task in widget.tasks)
                     Card(
@@ -87,7 +85,7 @@ Future<DateTime?> _selectDate(BuildContext context) async {
                           ),
                         ),
                         subtitle: Text(
-                          task.description,
+                          task.date,
                           style: TextStyle(
                             fontSize: 16.0,
                           ),
@@ -142,42 +140,42 @@ Future<DateTime?> _selectDate(BuildContext context) async {
                                       return null;
                                     },
                                   ),
-                                  TextFormField(
-                                    controller: _description,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Descreva a atividade',
-                                    ),
-                                  ),
                                   const SizedBox(height: 24),
-                                  Center(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Text(
-                                          '${_dateTime.day}/${_dateTime.month}/${_dateTime.year}',
-                                          style: TextStyle(
-                                            fontSize: 20,
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _date,
+                                          enabled: false,
+                                          decoration: const InputDecoration(
+                                            hintText: 'Data da atividade',
                                           ),
                                         ),
-                                        ElevatedButton(
-                                          onPressed: _showDatePicker, 
-                                          child: Text('Calendário')
+                                      ),
+                                      const SizedBox(
+                                          width:
+                                              24), // Adicione algum espaço entre os widgets
+                                      IconButton(
+                                        onPressed: _showDatePicker,
+                                        icon: Icon(
+                                          Icons.calendar_today,
+                                          color: Colors.blue,
                                         ),
-                                      ],
-                                    )
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(height: 24),
                                   Container(
-                                    alignment: AlignmentDirectional.centerEnd,
+                                    alignment: AlignmentDirectional.bottomEnd,
                                     child: ElevatedButton(
                                       onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
                                           DocumentReference docRef =
-                                              await widget.addTask(_title.text,
-                                                  _description.text);
+                                              await widget.addTask(
+                                                  _title.text, _date.text);
                                           String taskId = docRef.id;
                                           _title.clear();
-                                          _description.clear();
+                                          _date.clear();
                                           Navigator.pop(context);
                                         }
                                       },

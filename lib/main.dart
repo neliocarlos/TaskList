@@ -20,6 +20,14 @@ void main() {
   ));
 }
 
+void toggleLogin(BuildContext context, ApplicationState appState) {
+  if (appState.loggedIn) {
+    appState.logOut();
+  } else {
+    context.push('/sign-in');
+  }
+}
+
 final _router = GoRouter(
   routes: [
     GoRoute(
@@ -80,13 +88,49 @@ final _router = GoRouter(
         GoRoute(
           path: 'profile',
           builder: (context, state) {
-            return ProfileScreen(
-              providers: const [],
-              actions: [
-                SignedOutAction((context) {
-                  context.pushReplacement('/');
-                }),
-              ],
+            return Scaffold(
+              body: ProfileScreen(
+                providers: const [],
+                actions: [
+                  SignedOutAction((context) {
+                    context.pushReplacement('/');
+                  }),
+                ],
+              ),
+              bottomNavigationBar: BottomNavigationBar(
+                items: [
+                  BottomNavigationBarItem(
+                      icon: Icon(
+                        Icons.home,
+                        color: Colors.grey,
+                      ),
+                      label: 'Página Inicial',
+                      backgroundColor: Color.fromARGB(255, 44, 92, 196)),
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.person,
+                      color: Colors.blue.shade600,
+                    ),
+                    label: 'Perfil',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.logout,
+                      color: Colors.red,
+                    ),
+                    label: 'Sair',
+                  ),
+                ],
+                onTap: (int index) {
+                  if (index == 0) {
+                    GoRouter.of(context).go('/');
+                  } else if (index == 2) {
+                    toggleLogin(context,
+                        Provider.of<ApplicationState>(context, listen: false));
+                    context.push('/sign-in');
+                  }
+                },
+              ),
             );
           },
         ),

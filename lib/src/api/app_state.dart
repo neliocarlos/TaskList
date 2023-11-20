@@ -11,8 +11,7 @@ import 'package:gtk_flutter/src/components/tasklist/task_list_dto.dart';
 import 'firebase_options.dart';
 
 class ApplicationState extends ChangeNotifier {
-  Future<DocumentReference> addToTaskBoard(
-      String description, String title) async {
+  Future<DocumentReference> addToTaskBoard(String date, String title) async {
     if (!_loggedIn) {
       throw Exception('Must be logged in');
     }
@@ -21,7 +20,7 @@ class ApplicationState extends ChangeNotifier {
         .collection('tasklist')
         .add(<String, dynamic>{
       'title': title,
-      'description': description,
+      'date': date,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'name': FirebaseAuth.instance.currentUser!.displayName,
       'userId': FirebaseAuth.instance.currentUser!.uid,
@@ -42,13 +41,13 @@ class ApplicationState extends ChangeNotifier {
   }
 
   Future<void> updateTask(
-      String taskId, String newDescription, String newTitle) async {
+      String taskId, String newdate, String newTitle) async {
     if (!_loggedIn) {
       throw Exception('Must be logged in');
     }
 
     await FirebaseFirestore.instance.collection('tasklist').doc(taskId).update({
-      'description': newDescription,
+      'date': newdate,
       'title': newTitle,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     });

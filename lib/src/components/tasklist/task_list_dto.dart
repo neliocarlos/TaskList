@@ -1,19 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TaskListDto {
-  TaskListDto(
-      {required this.id, required this.title, required this.description});
+  TaskListDto({required this.id, required this.title, required this.date});
 
   final String id;
   final String title;
-  final String description;
+  final String date;
 
   factory TaskListDto.fromDocument(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
     return TaskListDto(
       id: doc.id,
       title: data['title'] as String,
-      description: data['description'] as String,
+      date: data['date'] as String,
     );
   }
 }

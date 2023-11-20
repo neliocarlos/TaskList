@@ -47,8 +47,8 @@ class HomePage extends StatelessWidget {
               children: [
                 if (appState.loggedIn) ...[
                   TaskList(
-                      addTask: (description, title) =>
-                          appState.addToTaskBoard(title, description),
+                      addTask: (date, title) =>
+                          appState.addToTaskBoard(title, date),
                       deleteTask: (taskId) => appState.deleteTask(taskId),
                       tasks: appState.taskListArray)
                 ],
@@ -60,7 +60,10 @@ class HomePage extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(
+                Icons.home,
+                color: Colors.blue.shade600,
+              ),
               label: 'Página Inicial',
               backgroundColor: Color.fromARGB(255, 44, 92, 196)),
           BottomNavigationBarItem(
