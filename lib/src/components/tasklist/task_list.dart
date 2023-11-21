@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gtk_flutter/src/components/modal/create_modal.dart';
 import 'package:gtk_flutter/src/components/modal/update_modal.dart';
@@ -98,7 +99,7 @@ class _TaskListState extends State<TaskList> {
     );
   }
 
-  String _selectedColor = '';
+  String _selectedColor = 'Azul';
 
   Color getColorFromName(String colorName) {
     switch (colorName) {
@@ -138,52 +139,53 @@ class _TaskListState extends State<TaskList> {
                     ),
                   const SizedBox(height: 8),
                   for (var task in widget.tasks)
-                    Card(
-                      color: getColorFromName(task.color),
-                      child: ListTile(
-                        textColor: Colors.white,
-                        title: Text(
-                          task.title,
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Text(
-                          task.date,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                          ),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              iconSize: 30,
-                              onPressed: () async {
-                                String taskId = task.id;
-                                await widget.deleteTask(taskId);
-                              },
-                              icon: Icon(
-                                Icons.delete_forever,
-                                color: Colors.white,
-                              ),
+                    if (task.userId == FirebaseAuth.instance.currentUser!.uid)
+                      Card(
+                        color: getColorFromName(task.color),
+                        child: ListTile(
+                          textColor: Colors.white,
+                          title: Text(
+                            task.title,
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
                             ),
-                            IconButton(
-                              iconSize: 30,
-                              onPressed: () {
-                                _setEditFormValues(task);
-                                _showEditModal(context, task);
-                              },
-                              icon: Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                              ),
+                          ),
+                          subtitle: Text(
+                            task.date,
+                            style: TextStyle(
+                              fontSize: 16.0,
                             ),
-                          ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                iconSize: 30,
+                                onPressed: () async {
+                                  String taskId = task.id;
+                                  await widget.deleteTask(taskId);
+                                },
+                                icon: Icon(
+                                  Icons.delete_forever,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              IconButton(
+                                iconSize: 30,
+                                onPressed: () {
+                                  _setEditFormValues(task);
+                                  _showEditModal(context, task);
+                                },
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                   const SizedBox(height: 12),
                   Container(
                     width: 50.0,
@@ -199,9 +201,6 @@ class _TaskListState extends State<TaskList> {
                       iconSize: 30,
                       icon: Icon(Icons.add, color: Colors.white),
                       onPressed: () {
-                        setState(() {
-                          _selectedColor = 'Azul';
-                        });
                         _showCreateModal(context);
                       },
                     ),

@@ -85,13 +85,6 @@ class CreateModal extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Selecione a cor do card:',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
               Container(
                 width: 50,
                 child: DropdownButtonFormField<String>(
