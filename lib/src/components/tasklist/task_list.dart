@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gtk_flutter/src/components/modal/create_modal.dart';
+import 'package:gtk_flutter/src/components/modal/update_modal.dart';
 
-import '../../auth/widgets.dart';
 import 'task_list_dto.dart';
 
 class TaskList extends StatefulWidget {
@@ -67,122 +68,37 @@ class _TaskListState extends State<TaskList> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-            padding: EdgeInsets.all(16.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Header('Adicione nova tarefa'),
-              const SizedBox(height: 72),
-              TextFormField(
-                controller: _title,
-                decoration: const InputDecoration(
-                  hintText: 'Título da Atividade',
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Escreva um título para continuar';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _date,
-                      enabled: false,
-                      decoration: const InputDecoration(
-                        hintText: 'Data da atividade',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  IconButton(
-                    onPressed: _showDatePicker,
-                    icon: Icon(
-                      Icons.calendar_today,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Selecione a cor do card:',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                  Container(
-                    width: 50,
-                    child: DropdownButtonFormField<String>(
-                      isExpanded: false,
-                      decoration: const InputDecoration(
-                        hintText: 'Selecione a cor',
-                        border: UnderlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        isDense: true,
-                      ),
-                      value: _selectedColor,
-                      items: [
-                        {'name': 'Azul', 'color': Colors.blue},
-                        {'name': 'Vermelho', 'color': Colors.red},
-                        {'name': 'Verde', 'color': Colors.green},
-                        {'name': 'Amarelo', 'color': Colors.yellow.shade700},
-                      ].map((Map<String, dynamic> item) {
-                        return DropdownMenuItem<String>(
-                          value: item['name'],
-                          child: Container(
-                            padding: EdgeInsets.all(8.0),
-                            color: item['color'],
-                            width: 24.0,
-                            height: 24.0,
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) {
-                        setState(() {
-                          _selectedColor = value ?? 'Azul';
-                          _color.text = _selectedColor;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Container(
-                alignment: AlignmentDirectional.bottomEnd,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      await widget.updateTask(
-                        task.id,
-                        _title.text,
-                        _date.text,
-                        _color.text,
-                      );
-
-                      _title.clear();
-                      _date.clear();
-                      _color.clear();
-
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text('Atualizar'),
-                ),
-              )
-            ]));
+        return UpdateModal(
+          titleController: _title,
+          dateController: _date,
+          colorController: _color,
+          selectedColor: _selectedColor,
+          onUpdate: (String newTitle, String newDate, String newColor) async {
+            await widget.updateTask(task.id, newTitle, newDate, newColor);
+          },
+        );
       },
     );
   }
+
+  void _showCreateModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return CreateModal(
+          titleController: _title,
+          dateController: _date,
+          colorController: _color,
+          selectedColor: _selectedColor,
+          onCreate: (String title, String date, String color) async {
+            await widget.addTask(title, date, color);
+          },
+        );
+      },
+    );
+  }
+
+  String _selectedColor = '';
 
   Color getColorFromName(String colorName) {
     switch (colorName) {
@@ -198,8 +114,6 @@ class _TaskListState extends State<TaskList> {
         return Colors.blue;
     }
   }
-
-  String _selectedColor = 'Azul';
 
   @override
   Widget build(BuildContext context) {
@@ -285,137 +199,10 @@ class _TaskListState extends State<TaskList> {
                       iconSize: 30,
                       icon: Icon(Icons.add, color: Colors.white),
                       onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Container(
-                              padding: EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Header('Adicione nova tarefa'),
-                                  const SizedBox(height: 72),
-                                  TextFormField(
-                                    controller: _title,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Título da Atividade',
-                                    ),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Escreva um título para continuar';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 24),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: _date,
-                                          enabled: false,
-                                          decoration: const InputDecoration(
-                                            hintText: 'Data da atividade',
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 24),
-                                      IconButton(
-                                        onPressed: _showDatePicker,
-                                        icon: Icon(
-                                          Icons.calendar_today,
-                                          color: Colors.blue,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 24),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Selecione a cor do card:',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 50,
-                                        child: DropdownButtonFormField<String>(
-                                          isExpanded: false,
-                                          decoration: const InputDecoration(
-                                            hintText: 'Selecione a cor',
-                                            border: UnderlineInputBorder(
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            isDense: true,
-                                          ),
-                                          value: _selectedColor,
-                                          items: [
-                                            {
-                                              'name': 'Azul',
-                                              'color': Colors.blue
-                                            },
-                                            {
-                                              'name': 'Vermelho',
-                                              'color': Colors.red
-                                            },
-                                            {
-                                              'name': 'Verde',
-                                              'color': Colors.green
-                                            },
-                                            {
-                                              'name': 'Amarelo',
-                                              'color': Colors.yellow.shade700
-                                            },
-                                          ].map((Map<String, dynamic> item) {
-                                            return DropdownMenuItem<String>(
-                                              value: item['name'],
-                                              child: Container(
-                                                padding: EdgeInsets.all(8.0),
-                                                color: item['color'],
-                                                width: 24.0,
-                                                height: 24.0,
-                                              ),
-                                            );
-                                          }).toList(),
-                                          onChanged: (String? value) {
-                                            setState(() {
-                                              _selectedColor = value ?? 'Azul';
-                                              _color.text = _selectedColor;
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 24),
-                                  Container(
-                                    alignment: AlignmentDirectional.bottomEnd,
-                                    child: ElevatedButton(
-                                      onPressed: () async {
-                                        if (_formKey.currentState!.validate()) {
-                                          DocumentReference docRef =
-                                              await widget.addTask(_title.text,
-                                                  _date.text, _color.text);
-                                          String taskId = docRef.id;
-                                          _title.clear();
-                                          _date.clear();
-                                          _color.clear();
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                      child: Text(
-                                        'Salvar',
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
+                        setState(() {
+                          _selectedColor = 'Azul';
+                        });
+                        _showCreateModal(context);
                       },
                     ),
                   ),
