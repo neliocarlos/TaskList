@@ -36,10 +36,14 @@ class ApplicationState extends ChangeNotifier {
       throw Exception('Must be logged in');
     }
 
-    await FirebaseFirestore.instance
-        .collection('tasklist')
-        .doc(taskId)
-        .delete();
+    try {
+      await FirebaseFirestore.instance
+          .collection('tasklist')
+          .doc(taskId)
+          .delete();
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Future<void> updateTask(
@@ -92,6 +96,7 @@ class ApplicationState extends ChangeNotifier {
         _loggedIn = true;
         _taskListSubscription = FirebaseFirestore.instance
             .collection('tasklist')
+            // .where({ user: {} })
             .orderBy('timestamp', descending: true)
             .snapshots()
             .listen((snapshot) {
