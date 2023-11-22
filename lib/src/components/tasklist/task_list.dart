@@ -103,146 +103,169 @@ class _TaskListState extends State<TaskList> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-            padding: EdgeInsets.all(16.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Header('Editar tarefa'),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: _title,
-                decoration: const InputDecoration(
-                  hintText: 'Título da Atividade',
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Escreva um título para continuar';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _date,
-                      enabled: false,
-                      decoration: const InputDecoration(
-                        hintText: 'Data da atividade',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  IconButton(
-                    onPressed: _showDatePicker,
-                    icon: Icon(
-                      Icons.calendar_today,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _initialTime,
-                      enabled: false,
-                      decoration: const InputDecoration(
-                        hintText: 'Início',
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: _showInitialTimePicker,
-                    icon: Icon(
-                      Icons.watch_later_outlined,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _finalTime,
-                      enabled: false,
-                      decoration: const InputDecoration(
-                        hintText: 'Encerramento',
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: _showFinalTimePicker,
-                    icon: Icon(
-                      Icons.watch_later_outlined,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    width: 50,
-                    child: DropdownButtonFormField<String>(
-                      isExpanded: false,
-                      decoration: const InputDecoration(
-                        hintText: 'Selecione a cor',
-                        border: UnderlineInputBorder(
-                          borderSide: BorderSide.none,
+        return WillPopScope(
+          onWillPop: () async {
+            _resetForm();
+            return true;
+          },
+          child: GestureDetector(
+            onTap: () {
+              _resetForm();
+              Navigator.pop(context);
+            },
+            child: Container(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Header('Editar tarefa'),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        controller: _title,
+                        decoration: const InputDecoration(
+                          hintText: 'Título da Atividade',
                         ),
-                        isDense: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Escreva um título para continuar';
+                          }
+                          return null;
+                        },
                       ),
-                      value: _selectedColor,
-                      items: [
-                        {'name': 'Azul', 'color': Colors.blue},
-                        {'name': 'Vermelho', 'color': Colors.red},
-                        {'name': 'Verde', 'color': Colors.green},
-                        {'name': 'Amarelo', 'color': Colors.yellow.shade700},
-                      ].map((Map<String, dynamic> item) {
-                        return DropdownMenuItem<String>(
-                          value: item['name'],
-                          child: Container(
-                            padding: EdgeInsets.all(8.0),
-                            color: item['color'],
-                            width: 24.0,
-                            height: 24.0,
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _date,
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                hintText: 'Data da atividade',
+                              ),
+                            ),
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) {
-                        setState(() {
-                          _selectedColor = value ?? 'Azul';
-                          _color.text = _selectedColor;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Container(
-                alignment: AlignmentDirectional.bottomEnd,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      await widget.updateTask(task.id, _title.text, _date.text,
-                          _color.text, _initialTime.text, _finalTime.text);
+                          const SizedBox(width: 24),
+                          IconButton(
+                            onPressed: _showDatePicker,
+                            icon: Icon(
+                              Icons.calendar_today,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _initialTime,
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                hintText: 'Início',
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: _showInitialTimePicker,
+                            icon: Icon(
+                              Icons.watch_later_outlined,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _finalTime,
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                hintText: 'Encerramento',
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: _showFinalTimePicker,
+                            icon: Icon(
+                              Icons.watch_later_outlined,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            width: 50,
+                            child: DropdownButtonFormField<String>(
+                              isExpanded: false,
+                              decoration: const InputDecoration(
+                                hintText: 'Selecione a cor',
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                isDense: true,
+                              ),
+                              value: _selectedColor,
+                              items: [
+                                {'name': 'Azul', 'color': Colors.blue},
+                                {'name': 'Vermelho', 'color': Colors.red},
+                                {'name': 'Verde', 'color': Colors.green},
+                                {
+                                  'name': 'Amarelo',
+                                  'color': Colors.yellow.shade700
+                                },
+                              ].map((Map<String, dynamic> item) {
+                                return DropdownMenuItem<String>(
+                                  value: item['name'],
+                                  child: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    color: item['color'],
+                                    width: 24.0,
+                                    height: 24.0,
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  _selectedColor = value ?? 'Azul';
+                                  _color.text = _selectedColor;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Container(
+                        alignment: AlignmentDirectional.bottomEnd,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              await widget.updateTask(
+                                  task.id,
+                                  _title.text,
+                                  _date.text,
+                                  _color.text,
+                                  _initialTime.text,
+                                  _finalTime.text);
 
-                      _title.clear();
-                      _date.clear();
-                      _color.clear();
+                              _title.clear();
+                              _date.clear();
+                              _color.clear();
+                              _initialTime.clear();
+                              _finalTime.clear();
 
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text('Atualizar'),
-                ),
-              )
-            ]));
+                              Navigator.pop(context);
+                            }
+                          },
+                          child: Text('Atualizar'),
+                        ),
+                      )
+                    ])),
+          ),
+        );
       },
     );
   }
@@ -263,6 +286,17 @@ class _TaskListState extends State<TaskList> {
   }
 
   String _selectedColor = 'Azul';
+
+  void _resetForm() {
+    _title.clear();
+    _date.clear();
+    _color.clear();
+    _initialTime.clear();
+    _finalTime.clear();
+    setState(() {
+      _selectedColor = 'Azul';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -309,7 +343,9 @@ class _TaskListState extends State<TaskList> {
                                 ),
                               ),
                               Text(
-                                '${task.initialTime} ~ ${task.finalTime}',
+                                task.finalTime.isEmpty
+                                    ? '${task.initialTime}'
+                                    : '${task.initialTime} ~ ${task.finalTime}',
                                 style: TextStyle(
                                   fontSize: 16.0,
                                 ),
@@ -429,7 +465,7 @@ class _TaskListState extends State<TaskList> {
                                           controller: _finalTime,
                                           enabled: false,
                                           decoration: const InputDecoration(
-                                            hintText: 'Encerramento',
+                                            hintText: 'Até (opicional)',
                                           ),
                                         ),
                                       ),
@@ -510,9 +546,9 @@ class _TaskListState extends State<TaskList> {
                                                   _initialTime.text,
                                                   _finalTime.text);
                                           String taskId = docRef.id;
-                                          _title.clear();
-                                          _date.clear();
-                                          _color.clear();
+
+                                          _resetForm();
+
                                           Navigator.pop(context);
                                         }
                                       },
