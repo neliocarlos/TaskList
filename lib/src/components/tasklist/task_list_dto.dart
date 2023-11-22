@@ -7,6 +7,8 @@ class TaskListDto {
     required this.date,
     required this.color,
     required this.userId,
+    required this.initialTime,
+    required this.finalTime,
   });
 
   final String id;
@@ -14,6 +16,8 @@ class TaskListDto {
   final String date;
   final String color;
   final String userId;
+  final String initialTime;
+  final String finalTime;
 
   factory TaskListDto.fromDocument(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
@@ -23,6 +27,8 @@ class TaskListDto {
       date: data['date'] as String,
       color: data['color'] as String,
       userId: data['userId'] as String,
+      initialTime: data['initialTime'] as String,
+      finalTime: data['finalTime'] as String,
     );
   }
 }

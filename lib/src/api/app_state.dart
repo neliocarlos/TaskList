@@ -11,8 +11,8 @@ import 'package:gtk_flutter/src/components/tasklist/task_list_dto.dart';
 import 'firebase_options.dart';
 
 class ApplicationState extends ChangeNotifier {
-  Future<DocumentReference> addToTaskBoard(
-      String date, String title, String color) async {
+  Future<DocumentReference> addToTaskBoard(String date, String title,
+      String color, String initialTime, String finalTime) async {
     if (!_loggedIn) {
       throw Exception('Must be logged in');
     }
@@ -23,6 +23,8 @@ class ApplicationState extends ChangeNotifier {
       'title': title,
       'date': date,
       'color': color,
+      'initialTime': initialTime,
+      'finalTime': finalTime,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'name': FirebaseAuth.instance.currentUser!.displayName,
       'userId': FirebaseAuth.instance.currentUser!.uid,
@@ -46,8 +48,8 @@ class ApplicationState extends ChangeNotifier {
     }
   }
 
-  Future<void> updateTask(
-      String taskId, String newDate, String newTitle, String newColor) async {
+  Future<void> updateTask(String taskId, String newDate, String newTitle,
+      String newColor, String newInitialTime, String newFinalTime) async {
     if (!_loggedIn) {
       throw Exception('Must be logged in');
     }
@@ -60,6 +62,8 @@ class ApplicationState extends ChangeNotifier {
         'date': newDate,
         'title': newTitle,
         'color': newColor,
+        'initialTime': newInitialTime,
+        'finalTime': newFinalTime,
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {
@@ -96,7 +100,7 @@ class ApplicationState extends ChangeNotifier {
         _loggedIn = true;
         _taskListSubscription = FirebaseFirestore.instance
             .collection('tasklist')
-            // .where({ user: {} })
+            // .where({ user.uid })
             .orderBy('timestamp', descending: true)
             .snapshots()
             .listen((snapshot) {

@@ -14,11 +14,10 @@ class TaskList extends StatefulWidget {
       required this.deleteTask,
       required this.tasks,
       super.key});
-  final FutureOr<DocumentReference> Function(
-      String title, String date, String color) addTask;
-  final Future<void> Function(
-          String taskId, String newTitle, String newDate, String newColor)
-      updateTask;
+  final FutureOr<DocumentReference> Function(String title, String date,
+      String color, String initialTime, String finalTime) addTask;
+  final Future<void> Function(String taskId, String newTitle, String newDate,
+      String newColor, String newInitialTime, String newFinalTime) updateTask;
   final Future<void> Function(String taskId) deleteTask;
   final List<TaskListDto> tasks;
 
@@ -31,7 +30,11 @@ class _TaskListState extends State<TaskList> {
   final _title = TextEditingController();
   final _date = TextEditingController();
   final _color = TextEditingController();
+  final _initialTime = TextEditingController();
+  final _finalTime = TextEditingController();
+
   DateTime _dateTime = DateTime.now();
+
   void _showDatePicker() async {
     DateTime? pickedDate = await _selectDate(context);
     if (pickedDate != null && pickedDate != _dateTime) {
@@ -59,7 +62,41 @@ class _TaskListState extends State<TaskList> {
     _title.text = task.title;
     _date.text = task.date;
     _color.text = task.color;
+    _initialTime.text = task.initialTime;
+    _finalTime.text = task.finalTime;
     _selectedColor = task.color;
+  }
+
+  TimeOfDay _currentTime = TimeOfDay.now();
+
+  void _showInitialTimePicker() {
+    showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      cancelText: 'Cancelar',
+      helpText: 'Selecione a hora:',
+      hourLabelText: 'Hora',
+      minuteLabelText: 'Minuto',
+    ).then((value) => setState(() {
+          _currentTime = value!;
+          _initialTime.text = '${_currentTime.hour}:${_currentTime.minute}';
+          _currentTime = TimeOfDay.now();
+        }));
+  }
+
+  void _showFinalTimePicker() {
+    showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      cancelText: 'Cancelar',
+      helpText: 'Selecione a hora:',
+      hourLabelText: 'Hora',
+      minuteLabelText: 'Minuto',
+    ).then((value) => setState(() {
+          _currentTime = value!;
+          _finalTime.text = '${_currentTime.hour}:${_currentTime.minute}';
+          _currentTime = TimeOfDay.now();
+        }));
   }
 
   void _showEditModal(BuildContext context, TaskListDto task) {
@@ -71,7 +108,7 @@ class _TaskListState extends State<TaskList> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Header('Editar tarefa'),
-              const SizedBox(height: 72),
+              const SizedBox(height: 24),
               TextFormField(
                 controller: _title,
                 decoration: const InputDecoration(
@@ -101,6 +138,44 @@ class _TaskListState extends State<TaskList> {
                     onPressed: _showDatePicker,
                     icon: Icon(
                       Icons.calendar_today,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _initialTime,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        hintText: 'Início',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _showInitialTimePicker,
+                    icon: Icon(
+                      Icons.watch_later_outlined,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _finalTime,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        hintText: 'Encerramento',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _showFinalTimePicker,
+                    icon: Icon(
+                      Icons.watch_later_outlined,
                       color: Colors.blue,
                     ),
                   ),
@@ -154,12 +229,8 @@ class _TaskListState extends State<TaskList> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      await widget.updateTask(
-                        task.id,
-                        _title.text,
-                        _date.text,
-                        _color.text,
-                      );
+                      await widget.updateTask(task.id, _title.text, _date.text,
+                          _color.text, _initialTime.text, _finalTime.text);
 
                       _title.clear();
                       _date.clear();
@@ -228,11 +299,22 @@ class _TaskListState extends State<TaskList> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          subtitle: Text(
-                            task.date,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                            ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                task.date,
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                ),
+                              ),
+                              Text(
+                                '${task.initialTime} ~ ${task.finalTime}',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                ),
+                              ),
+                            ],
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -287,7 +369,7 @@ class _TaskListState extends State<TaskList> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Header('Adicione nova tarefa'),
-                                  const SizedBox(height: 72),
+                                  const SizedBox(height: 54),
                                   TextFormField(
                                     controller: _title,
                                     decoration: const InputDecoration(
@@ -317,6 +399,44 @@ class _TaskListState extends State<TaskList> {
                                         onPressed: _showDatePicker,
                                         icon: Icon(
                                           Icons.calendar_today,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _initialTime,
+                                          enabled: false,
+                                          decoration: const InputDecoration(
+                                            hintText: 'Início',
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: _showInitialTimePicker,
+                                        icon: Icon(
+                                          Icons.watch_later_outlined,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 24),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _finalTime,
+                                          enabled: false,
+                                          decoration: const InputDecoration(
+                                            hintText: 'Encerramento',
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: _showFinalTimePicker,
+                                        icon: Icon(
+                                          Icons.watch_later_outlined,
                                           color: Colors.blue,
                                         ),
                                       ),
@@ -383,8 +503,12 @@ class _TaskListState extends State<TaskList> {
                                       onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
                                           DocumentReference docRef =
-                                              await widget.addTask(_title.text,
-                                                  _date.text, _color.text);
+                                              await widget.addTask(
+                                                  _title.text,
+                                                  _date.text,
+                                                  _color.text,
+                                                  _initialTime.text,
+                                                  _finalTime.text);
                                           String taskId = docRef.id;
                                           _title.clear();
                                           _date.clear();
