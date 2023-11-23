@@ -15,8 +15,10 @@ import 'src/pages/home/home_page.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
+  ApplicationState appState = ApplicationState();
+
   runApp(ChangeNotifierProvider(
-    create: (context) => ApplicationState(),
+    create: (context) => appState,
     builder: ((context, child) => const App()),
   ));
 }
@@ -128,7 +130,7 @@ final _router = GoRouter(
                   } else if (index == 2) {
                     toggleLogin(context,
                         Provider.of<ApplicationState>(context, listen: false));
-                    context.push('/sign-in');
+                    // context.push('/sign-in');
                   }
                 },
               ),
