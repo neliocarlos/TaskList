@@ -64,7 +64,7 @@ class HomePage extends StatelessWidget {
                     heightFactor: 16,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/sign-in');
+                        context.push('/sign-in');
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
