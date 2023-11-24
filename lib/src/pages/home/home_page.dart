@@ -48,13 +48,14 @@ class HomePage extends StatelessWidget {
               children: [
                 if (appState.loggedIn) ...[
                   TaskList(
-                    addTask: (date, title, color, initialTime, finalTime) =>
-                        appState.addToTaskBoard(
-                            title, date, color, initialTime, finalTime),
+                    addTask: (date, title, color, initialTime, finalTime,
+                            completed) =>
+                        appState.addToTaskBoard(title, date, color, initialTime,
+                            finalTime, completed),
                     updateTask: (taskId, newTitle, newDate, newColor,
-                            newInitialTime, newFinalTime) =>
+                            newInitialTime, newFinalTime, newCompleted) =>
                         appState.updateTask(taskId, newDate, newTitle, newColor,
-                            newInitialTime, newFinalTime),
+                            newInitialTime, newFinalTime, newCompleted),
                     deleteTask: (taskId) => appState.deleteTask(taskId),
                     tasks: appState.taskListArray,
                   ),

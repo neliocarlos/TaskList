@@ -14,10 +14,21 @@ class TaskList extends StatefulWidget {
       required this.deleteTask,
       required this.tasks,
       super.key});
-  final FutureOr<DocumentReference> Function(String title, String date,
-      String color, String initialTime, String finalTime) addTask;
-  final Future<void> Function(String taskId, String newTitle, String newDate,
-      String newColor, String newInitialTime, String newFinalTime) updateTask;
+  final FutureOr<DocumentReference> Function(
+      String title,
+      String date,
+      String color,
+      String initialTime,
+      String finalTime,
+      bool completed) addTask;
+  final Future<void> Function(
+      String taskId,
+      String newTitle,
+      String newDate,
+      String newColor,
+      String newInitialTime,
+      String newFinalTime,
+      bool completed) updateTask;
   final Future<void> Function(String taskId) deleteTask;
   final List<TaskListDto> tasks;
 
@@ -251,7 +262,8 @@ class _TaskListState extends State<TaskList> {
                                     _date.text,
                                     _color.text,
                                     _initialTime.text,
-                                    _finalTime.text);
+                                    _finalTime.text,
+                                    task.completed);
 
                                 _title.clear();
                                 _date.clear();
@@ -301,6 +313,23 @@ class _TaskListState extends State<TaskList> {
     });
   }
 
+  void _toggleTaskCompletion(TaskListDto task) async {
+    bool newCompleted = !task.completed;
+    await widget.updateTask(
+      task.id,
+      task.title,
+      task.date,
+      task.color,
+      task.initialTime,
+      task.finalTime,
+      newCompleted,
+    );
+
+    setState(() {
+      task.completed = newCompleted;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -324,7 +353,9 @@ class _TaskListState extends State<TaskList> {
                   for (var task in widget.tasks)
                     if (task.userId == FirebaseAuth.instance.currentUser!.uid)
                       Card(
-                        color: getColorFromName(task.color),
+                        color: task.completed == true
+                            ? Colors.grey
+                            : getColorFromName(task.color),
                         child: ListTile(
                           textColor: Colors.white,
                           title: Text(
@@ -367,14 +398,27 @@ class _TaskListState extends State<TaskList> {
                                   color: Colors.white,
                                 ),
                               ),
+                              if (!task.completed)
+                                IconButton(
+                                  iconSize: 30,
+                                  onPressed: () {
+                                    _setEditFormValues(task);
+                                    _showEditModal(context, task);
+                                  },
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               IconButton(
                                 iconSize: 30,
                                 onPressed: () {
-                                  _setEditFormValues(task);
-                                  _showEditModal(context, task);
+                                  _toggleTaskCompletion(task);
                                 },
                                 icon: Icon(
-                                  Icons.edit,
+                                  task.completed
+                                      ? Icons.restore_page
+                                      : Icons.check,
                                   color: Colors.white,
                                 ),
                               ),
@@ -563,7 +607,8 @@ class _TaskListState extends State<TaskList> {
                                                       _date.text,
                                                       _color.text,
                                                       _initialTime.text,
-                                                      _finalTime.text);
+                                                      _finalTime.text,
+                                                      false);
                                               String taskId = docRef.id;
 
                                               _resetForm();

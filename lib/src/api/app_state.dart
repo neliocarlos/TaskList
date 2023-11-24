@@ -11,10 +11,15 @@ import 'package:gtk_flutter/src/components/tasklist/task_list_dto.dart';
 import 'firebase_options.dart';
 
 class ApplicationState extends ChangeNotifier {
-  Future<DocumentReference> addToTaskBoard(String date, String title,
-      String color, String initialTime, String finalTime) async {
+  Future<DocumentReference> addToTaskBoard(
+      String date,
+      String title,
+      String color,
+      String initialTime,
+      String finalTime,
+      bool completed) async {
     if (!_loggedIn) {
-      throw Exception('Must be logged in');
+      throw Exception('Precisa estar conectado');
     }
 
     DocumentReference docRef = await FirebaseFirestore.instance
@@ -25,6 +30,7 @@ class ApplicationState extends ChangeNotifier {
       'color': color,
       'initialTime': initialTime,
       'finalTime': finalTime,
+      'completed': completed.toString(),
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'name': FirebaseAuth.instance.currentUser!.displayName,
       'userId': FirebaseAuth.instance.currentUser!.uid,
@@ -48,11 +54,18 @@ class ApplicationState extends ChangeNotifier {
     }
   }
 
-  Future<void> updateTask(String taskId, String newDate, String newTitle,
-      String newColor, String newInitialTime, String newFinalTime) async {
+  Future<void> updateTask(
+      String taskId,
+      String newDate,
+      String newTitle,
+      String newColor,
+      String newInitialTime,
+      String newFinalTime,
+      bool newCompleted) async {
     if (!_loggedIn) {
       throw Exception('Must be logged in');
     }
+    // bool completed = (newCompleted.toLowerCase() == 'true');
 
     try {
       await FirebaseFirestore.instance
@@ -64,6 +77,7 @@ class ApplicationState extends ChangeNotifier {
         'color': newColor,
         'initialTime': newInitialTime,
         'finalTime': newFinalTime,
+        'completed': newCompleted,
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {
@@ -100,7 +114,7 @@ class ApplicationState extends ChangeNotifier {
         _loggedIn = true;
         _taskListSubscription = FirebaseFirestore.instance
             .collection('tasklist')
-            // .where({ user.uid })
+            // .where('userId', isEqualTo: user.uid)
             .orderBy('timestamp', descending: true)
             .snapshots()
             .listen((snapshot) {
